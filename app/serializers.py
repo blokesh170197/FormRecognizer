@@ -9,8 +9,3 @@ class UploadSerializer(Serializer):
         fields = ['file_uploaded']
 
 
-# Serializer for multiple files upload.
-class MultipleFilesUploadSerializer(Serializer):
-    file_uploaded = ListField(FileField())
-    class Meta:
-        fields = ['file_uploaded']
