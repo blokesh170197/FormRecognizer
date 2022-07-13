@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from .serializers import UploadSerializer
 from rest_framework import status 
 
-from utils.config import INPUT_FILE, OUTPUT_DIR, PARENT_DIR
+from copro.utils.config import INPUT_FILE, OUTPUT_DIR, PARENT_DIR
 from core.ImageConversion import ImageConversion
 from core.PaperItemization import PaperItemization
 from core.AutoRotation import AutoRotation

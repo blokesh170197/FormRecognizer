@@ -1,6 +1,5 @@
 import os
 
-
 # parent directory
 PARENT_DIR = "/home/hwuser/Workspace/"
 

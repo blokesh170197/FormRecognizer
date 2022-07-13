@@ -5,15 +5,15 @@ services:
   zaas-halo-py-api:
     image: property_analytics:1.0.0
     container_name: INTICS
-    hostname: halo.py.service
+    hostname: intics.copro
     build: .
     ports:
-      - "5999:8000"
+      - "8000:8000"
     environment:
       TZ: "Asia/Kolkata"
-    command: python manage.py runserver 127.0.0.1:8000
+    command: python manage.py runserver 8000
     volumes:
-      - ./source-of-truth:/source-of-truth
+      - ./source-of-truth:/app/source-of-truth
       - ./tmp:/tmp
     networks:
       halo-dl-net:
