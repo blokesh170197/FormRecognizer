@@ -2,18 +2,12 @@
 
 import os
 import warnings
-import logging
 
 from pathlib import Path
 from PyPDF2 import PdfFileWriter, PdfFileReader
+from copro.core.logger import logger
 
 warnings.filterwarnings('ignore')
-# Create and configure logger
-logging.basicConfig(filename="running_info.log", format='%(asctime)s %(message)s', filemode='w')
-# Creating an object
-logger = logging.getLogger()
-# Setting the threshold of logger to DEBUG
-logger.setLevel(logging.DEBUG)
 
 
 class PaperItemization:

@@ -2,18 +2,13 @@
 
 import os
 import warnings
-import logging
+import matplotlib.pyplot as plt
 
 from pathlib import Path
 from pdf2image import convert_from_path
+from copro.core.logger import logger
 
 warnings.filterwarnings('ignore')
-# Create and configure logger
-logging.basicConfig(filename="running_info.log", format='%(asctime)s %(message)s', filemode='w')
-# Creating an object
-logger = logging.getLogger()
-# Setting the threshold of logger to DEBUG
-logger.setLevel(logging.DEBUG)
 
 
 class ImageConversion:
@@ -58,6 +53,11 @@ class ImageConversion:
             for img_count in range(len(images)):
                 images[img_count].save(f'{image_conversion_path}/{file_name}.jpg', 'JPEG')
                 count = count + 1
+
+                plt.figure(figsize=(15, 8))
+                plt.imshow(images[img_count], cmap='gray')
+                plt.title('Image Conversion')
+                plt.show()
 
         logger.info("IMAGE CONVERSION END")
 

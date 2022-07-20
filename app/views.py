@@ -1,32 +1,36 @@
-import sys
+
+""" import packages """
+
+import os
 import uuid
-import logging
 from pathlib import Path
 
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
-from .serializers import UploadSerializer
-from rest_framework import status 
+from .serializers import DoAssetAttributionSerializer
+from rest_framework import status
 
-from copro.utils.config import INPUT_FILE, OUTPUT_DIR, PARENT_DIR
-from core.ImageConversion import ImageConversion
-from core.PaperItemization import PaperItemization
-from core.AutoRotation import AutoRotation
+from copro.utils.config import PARENT_DIR
+from copro.core.ImageConversion import ImageConversion
+from copro.core.PaperItemization import PaperItemization
+from copro.core.AutoRotation import AutoRotation
+from copro.core.TableDetection import TableDetection
+from copro.core.TableColumnDetection import TableColumnDetection
+from copro.core.TableDataExtraction import TableDataExtraction
 from copro.core.FileDetails import getChecksum, getFileSize
 
-logging.basicConfig(filename="running_info.log", format='%(asctime)s %(message)s', filemode='w')
-# Creating an object
-logger = logging.getLogger()
-# Setting the threshold of logger to DEBUG
-logger.setLevel(logging.DEBUG)
+from copro.table.table_config import TABLE_MODEL_DIR, DEVICE, TABLE_COLUMNS_MODEL
+from copro.table.utils import load_checkpoint, get_TableMasks, fixMasks, display
+from copro.table.model import TableNet
+from copro.core.logger import logger
 
 
 class InformationExtraction(ViewSet):
 
-    serializer_class = UploadSerializer
+    serializer_class = DoAssetAttributionSerializer
 
     def list(self, request):
-        return Response("GET API")
+        return Response("POST API")
 
     def create(self, request):
         response = {}
@@ -51,6 +55,19 @@ class InformationExtraction(ViewSet):
             auto_rotation = AutoRotation(input_file, output_dir, image_conversion_path)
             auto_rotation_path = auto_rotation.auto_rotation()
 
+            for auto_rotated_files in os.listdir(auto_rotation_path):
+                auto_rotated_files = os.path.join(auto_rotation_path, auto_rotated_files)
+
+                table_detection = TableDetection(auto_rotated_files, output_dir, TABLE_MODEL_DIR, DEVICE,
+                                                 load_checkpoint, get_TableMasks, fixMasks, display, TableNet)
+                table_detection_path = table_detection.table_detection()
+
+                table_column_detection = TableColumnDetection(auto_rotated_files, output_dir, TABLE_COLUMNS_MODEL)
+                table_column_detection_path = table_column_detection.table_column_detection()
+
+                table_extraction = TableDataExtraction(input_file, output_dir, table_column_detection_path)
+                table_extraction_path = table_extraction.table_data_extraction()
+
             response['status'] = status.HTTP_200_OK
             response['id'] = uuid.uuid1()
 
@@ -63,6 +80,10 @@ class InformationExtraction(ViewSet):
             response["itemizedPaperPath"] = paper_itemization_path
             response["convertedImagePath"] = image_conversion_path
             response["autoRotationPath"] = auto_rotation_path
+
+            response["detectedTablesPath"] = table_detection_path
+            response["detectedTableColumnsPath"] = table_column_detection_path
+            response["extractedTableContentsPath"] = table_extraction_path
 
         except Exception as e:
 

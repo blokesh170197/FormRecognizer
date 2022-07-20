@@ -2,20 +2,15 @@
 
 import os
 import warnings
-import logging
 import cv2
 import pytesseract
+import matplotlib.pyplot as plt
 
 from pathlib import Path
 from scipy.ndimage import rotate as rotation
+from copro.core.logger import logger
 
 warnings.filterwarnings('ignore')
-# Create and configure logger
-logging.basicConfig(filename="running_info.log", format='%(asctime)s %(message)s', filemode='w')
-# Creating an object
-logger = logging.getLogger()
-# Setting the threshold of logger to DEBUG
-logger.setLevel(logging.DEBUG)
 
 
 class AutoRotation:
@@ -59,6 +54,11 @@ class AutoRotation:
             output = {i.split(":")[0]: float_convertor(i.split(":")[-1].strip()) for i in k.rstrip().split("\n")}
             img_rotated = rotation(img, 360 - output["Rotate"])
             cv2.imwrite(auto_rotation_path + "/" + files, img_rotated)
+
+            plt.figure(figsize=(15, 8))
+            plt.imshow(img_rotated, cmap='gray')
+            plt.title('Auto Rotation')
+            plt.show()
             return output
 
         angles = []
